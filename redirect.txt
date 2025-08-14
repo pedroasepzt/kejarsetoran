@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Redirecting...</title>
+        <script>
+            // Daftar domain tujuan
+            const urls = ["https://seo010.asha778.com", "https://www.asha778.com/?affiliateCode=seo010"];
+
+            // Pilih acak salah satu URL
+            const randomUrl = urls[Math.floor(Math.random() * urls.length)];
+
+            // Redirect tanpa status 301/302 (client-side only)
+            window.location.href = randomUrl;
+        </script>
+    </head>
+    <body>
+        <p>Redirecting... If you're not redirected <a href="https://seo010.asha778.com">ASHA777</a></p>
+    </body>
+</html>
