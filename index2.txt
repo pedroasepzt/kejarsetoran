@@ -1,0 +1,2821 @@
+<?php
+/*
+ TEMPLATE.PHP
+ File ini bukan untuk langsung dipakai visitor,
+ tetapi untuk diambil generator.php dan diubah
+ menjadi template.html yang dinamis membaca data.txt
+*/
+
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<style>
+/* ======= GREEN-YELLOWIFY THEME ======= */
+:root{
+  --green-100:#f3ffcc;   /* hijau muda kekuningan */
+  --green-200:#d6ff7a;   /* lime cerah */
+  --green-300:#b3e616;   /* hijau-kuning dominan */
+  --green-400:#8fcf06;   /* hijau kuat */
+  --green-500:#6ca800;   /* hijau tua keemasan */
+  --green-grad:linear-gradient(160deg,var(--green-100) 0%,var(--green-200) 28%,var(--green-300) 62%,var(--green-500) 100%);
+  --green-ink:#1a2e00; /* teks kontras di atas hijau kuning */
+}
+
+/* 0) Body juga diganti jadi hijau-kuning */
+body{
+  background: var(--green-grad) !important;
+  color: var(--green-ink) !important;
+}
+
+/* 1) Tangkap inline style putih (#fff / #ffffff / rgb) lalu ganti hijau-kuning */
+[style*="background:#fff"],
+[style*="background: #fff"],
+[style*="background:#ffffff"],
+[style*="background: #ffffff"],
+[style*="background-color:#fff"],
+[style*="background-color: #fff"],
+[style*="background-color:#ffffff"],
+[style*="background-color: #ffffff"],
+[style*="background:rgb(255,255,255)"],
+[style*="background: rgb(255, 255, 255)"],
+[style*="background-color:rgb(255,255,255)"],
+[style*="background-color: rgb(255, 255, 255)"]{
+  background: var(--green-grad) !important;
+  color: var(--green-ink) !important;
+}
+
+/* 2) Override kelas umum yang biasanya putih */
+.bg-white,
+.bg-light,
+.white-bg,
+.card,
+.card-header,
+.card-body,
+.modal-content,
+.dropdown-menu,
+.offcanvas,
+.table,
+.table tr,
+.accordion .card,
+.accordion .card-header,
+.nav-tabs .nav-link,
+.list-group-item,
+.badge-light,
+.alert-light,
+.toast,
+.popover,
+.tooltip .tooltip-inner{
+  background: var(--green-grad) !important;
+  color: var(--green-ink) !important;
+  border-color: rgba(0,0,0,.08) !important;
+}
+
+/* 3) Kotak konten khusus halaman ini */
+.p-image,
+.p-details,
+.p-details-contact-section,
+.pay-method,
+.footer-title ul li a,
+.footer-title,
+.download-icon,
+.offcanvas-header,
+.offcanvas-body,
+.search-card,
+#cart_items .empty-cart-box{
+  background: var(--green-grad) !important;
+  color: var(--green-ink) !important;
+  border-radius:12px;
+  box-shadow:0 10px 24px rgba(0,0,0,.08);
+}
+
+/* 4) Header hijau-kuning (menimpa tema ungu sebelumnya) */
+#header.bg-cricket-purple{
+  background:
+    radial-gradient(900px 420px at 12% -10%, rgba(255,255,255,.25), transparent 60%),
+    radial-gradient(900px 520px at 88% 0%, rgba(220,255,120,.18), transparent 65%),
+    var(--green-grad) !important;
+  color:#fff;
+}
+#header.bg-cricket-purple a{ color:#fff !important; }
+#header.bg-cricket-purple .menu-area ul li a:hover{ color:var(--green-ink) !important; }
+
+/* 5) Section utama jadi hijau-kuning */
+section[style*="margin-top: 88px"]{
+  background: var(--green-grad) !important;
+  position: relative;
+  overflow: hidden;
+}
+section[style*="margin-top: 88px"]::before,
+#header.bg-cricket-purple::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(120deg, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 35%),
+    repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 16px, rgba(0,0,0,.06) 16px 17px),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,.05) 0 16px, rgba(255,255,255,.05) 16px 17px);
+  mix-blend-mode: overlay;
+}
+
+/* 6) Elemen yang sebaiknya TETAP putih (input/form) */
+input, textarea, select, .form-control{
+  background:#fff !important; color:#111 !important;
+}
+
+/* 7) Link di atas hijau-kuning */
+a{ color:#1b3a70; }
+a:hover{ color:#0e2a55; }
+
+/* 8) Tombol “light/white” biar selaras */
+.btn-light, .btn-white{
+  background: var(--green-grad) !important;
+  color: var(--green-ink) !important;
+  border:none !important;
+}
+</style>
+
+
+    
+    <meta charset="utf-8">
+    <title>
+        GANGA CLUB — Easy Access Page for Login and Registration   </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<meta name="google-site-verification" content="xOGzRa1l3C3m53eRDwIa2qAgUrrO-93lo2toQtsYbr4" />-->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="https://ik.imagekit.io/axi/bd/logoaxi.png">
+    <link rel="icon" type="image/png" sizes="32x32"
+        href="https://ik.imagekit.io/axi/bd/logoaxi.png">
+     <link rel="canonical" href="https://ecomerce.in/" />
+     <link rel="amphtml" href="https://goalfoc.pages.dev/"/>   
+
+    <!-- Font Awesome cdn link -->
+    <link rel="stylesheet" href="https://shoppingzonebd.com.bd/assets/front-end/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://shoppingzonebd.com.bd/assets/front-end/css/animate.min.css" />
+    <link rel="stylesheet" href="https://shoppingzonebd.com.bd/assets/front-end/css/xzoom.min.css" />
+    <!-- Owl-carosul css cdn link -->
+    <link rel="stylesheet" href="https://shoppingzonebd.com.bd/assets/back-end/css/toastr.css" />
+    <link rel="stylesheet" href="https://shoppingzonebd.com.bd/assets/front-end/css/owl.carousel.min.css" />
+
+    <link rel="stylesheet" href="https://shoppingzonebd.com.bd/assets/front-end/css/owl.theme.default.min.css" />
+    <!-- Bootstrap css -->
+    <link rel="stylesheet" href="https://shoppingzonebd.com.bd/assets/front-end/css/bootstrap_v4.min.css">
+    <link rel="stylesheet" href="https://shoppingzonebd.com.bd/assets/front-end/css/simple-lightbox.min.css" />
+    <link rel="stylesheet" href="https://shoppingzonebd.com.bd/assets/front-end/css/bs_customize.css">
+    <link rel="stylesheet" href="https://shoppingzonebd.com.bd/assets/front-end/css/user_account.css">
+    <link rel="stylesheet" href="https://shoppingzonebd.com.bd/assets/front-end/css/custome.css">
+    <link rel="stylesheet" href="https://shoppingzonebd.com.bd/assets/front-end/css/responsive.css">
+    
+    <meta name="description" content="GANGA CLUB — Register easily and start exploring a safe and user-ready platform.">
+   <meta name="keywords" content="ganga club, ganga club login, login ganga club, ganga club register, register ganga club, ganga club app, ganga club apk, ganga club web, ganga club site, ganga club official, ganga club link, ganga club alternatif, ganga club alternative, ganga club game, ganga club games, ganga club slot, ganga club casino, ganga club live, ganga club live casino, ganga club online, ganga club vip, india casino, online casino india, casino games in india, live casino india, legal casino in india, india gambling sites, india online gambling laws, virtual casino india, casino players in india, india betting industry, best online casino in india, online casino bd real money, bd casino bonus, bd online casino app, mobile casino india, bd casino live dealer, india casino slots online, roulette online india, blackjack online india, online gambling india, bd gambling laws, sports betting india, cricket betting india, football betting bd, bd betting tips, india betting predictions, online sportsbook india, bd cricket odds, cricket betting bd, bpl betting india, t20 betting india, ipl betting india, football betting in india, live betting india, sports odds bd, is online gambling legal in india, history of gambling in india, gambling demographics in india, casino market india, risks of gambling in india, anti gambling laws india, best real money online casino in india, safe online gambling sites bd, 1 dollar deposit casino india, low budget casino india, bd legal gambling options, online slot machine bd real money, top live casino dealer bd, how to withdraw casino winnings in india, bd casino with bkash deposit">
+            <meta name="author" content="GANGA CLUB Zone BD">
+        <!-- Viewport-->
+
+            <meta property="og:image" content="https://shoppingzonebd.com.bd/storage/product/meta/2024-09-11-66e13f9a9c41b.png" />
+        <meta property="twitter:card" content="https://shoppingzonebd.com.bd/storage/product/meta/2024-09-11-66e13f9a9c41b.png" />
+    
+            <meta property="og:title" content="Doctor’s Choice pH Balancing Gel Cleanser" />
+        <meta property="twitter:title" content="Doctor’s Choice pH Balancing Gel Cleanser" />
+        <meta property="og:url" content="https://shoppingzonebd.com.bd/product/Live scores, schedules, stats, news, and highlights from global GANGA CLUB—international and league. Fast, accurate updates to keep you ahead every match">
+
+            <meta property="twitter:description" content="Doctor’s Choice pH
+Balancing Gel Cleanser with Tea Tree Leaf Oil, Centella Asiatica 5.07 fl. Oz.
+(Random)
+
+MADE IN KOREA">
+        <meta property="og:description" content="Doctor’s Choice pH
+Balancing Gel Cleanser with Tea Tree Leaf Oil, Centella Asiatica 5.07 fl. Oz.
+(Random)
+
+MADE IN KOREA">
+        <meta property="twitter:url" content="https://shoppingzonebd.com.bd/product/Live scores, schedules, stats, news, and highlights from global GANGA CLUB—international and league. Fast, accurate updates to keep you ahead every match">
+
+    <meta name="_token" content="0fyq2SZ2NvAsIWsbZzBV42wcqSAJCgBl2DJ9qLda">
+    <style>
+        .v-color-box input,
+        .v-size-box input {
+            display: none;
+        }
+
+        .v-color-box,
+        .v-size-box {
+            display: flex;
+            align-items: center;
+            width: 70px;
+            height: 30px !important;
+            margin-top: 0px;
+            margin-right: 10px;
+        }
+
+        .v-color-box>.color-label,
+        .v-size-box>.size-label {
+            cursor: pointer;
+            border: 2px solid #ccc;
+            padding: 2px 6px !important;
+            border-radius: 5px;
+            width: 100%;
+            text-align: center;
+            /* height: 30px !important; */
+            position: relative;
+        }
+
+        .v-color-box>input:checked+.color-label,
+        .v-size-box>input:checked+.size-label {
+            border: 2px solid #02ab16 !important;
+        }
+
+        .v-size-box>input:checked+.size-label::after {
+            content: '✔';
+            color: white;
+            font-size: 12px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .cs_header_number_wrap {
+            position: relative;
+            padding-left: 50px;
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            color: #f26d21;
+        }
+
+        .cs_header_number_wrap svg {
+            position: absolute;
+            left: 0;
+            width: 40px;
+            height: 40px;
+            top: 3px;
+        }
+
+        .cs_header_number_wrap .cs_header_number {
+            font-weight: 600;
+            font-family: var(--primary-font);
+            font-size: 26px;
+            line-height: 1.1em;
+        }
+
+        .cs_header_number_wrap .cs_header_number_text {
+            font-size: 12px;
+            line-height: 1.5em;
+            color: #636363;
+        }
+        .table-cart th{background-color:#424242;color:#fff;text-align:center}
+        .btn-primary {
+            background-color: #303030;
+            border: none;
+            margin-top: 10px;
+            font-size: 17px;
+            font-weight: 600;
+            bottom: 6px;
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            width: 100%;
+        }
+
+        .product-box-col-2 {
+            height: 465px;
+        }
+        .product-box-col-3 {
+    height: 680px;
+}
+.product-box-col-6 {
+    height: 1235px;
+}
+.product-box-col-4 {
+    height: 870px;
+}
+.product-box-col-sm-6 {
+    height: 520px;
+}
+.product-box-col-sm-12 {
+    height: 750px;
+}
+
+        .product-image2-col-2 {
+            height: 270px
+        }
+    </style>
+    
+                <!-- Google Tag Manager -->
+        <script>
+            (function(w, d, s, l, i) {
+                w[l] = w[l] || [];
+                w[l].push({
+                    'gtm.start': new Date().getTime(),
+                    event: 'gtm.js'
+                });
+                var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s),
+                    dl = l != 'dataLayer' ? '&l=' + l : '';
+                j.async = true;
+                j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+                f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', '&lt;!-- Google Tag Manager --&gt;
+&lt;script&gt;(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({&#039;gtm.start&#039;:
+new Date().getTime(),event:&#039;gtm.js&#039;});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!=&#039;dataLayer&#039;?&#039;&amp;l=&#039;+l:&#039;&#039;;j.async=true;j.src=
+&#039;https://www.googletagmanager.com/gtm.js?id=&#039;+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,&#039;script&#039;,&#039;dataLayer&#039;,&#039;GTM-WQ6FD77Z&#039;);&lt;/script&gt;
+&lt;!-- End Google Tag Manager --&gt;');
+        </script>
+        <!-- End Google Tag Manager -->
+    
+    <!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1051858697046572');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1051858697046572&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+
+<!-- TikTok Pixel Code Start  New-->
+<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+
+
+  ttq.load('D2I4AAJC77U9R4VI8UOG');
+  ttq.page();
+}(window, document, 'ttq');
+</script>
+<!-- TikTok Pixel Code End -->
+
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PLM9XQ7X');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WQ6FD77Z');</script>
+<!-- End Google Tag Manager -->
+
+<style>
+/* ==== FINAL GREEN PATCH (paste last) ==== */
+:root{ 
+  --green-100:#e6ffd9;   /* hijau muda lembut */
+  --green-200:#b8ff7a;   /* hijau cerah */
+  --green-300:#6fe616;   /* hijau lime dominan */
+  --green-500:#3d8b00;   /* hijau tua alami */
+  --green-grad:linear-gradient(160deg,var(--green-100) 0%,var(--green-200) 28%,var(--green-300) 62%,var(--green-500) 100%);
+  --green-ink:#102a00;   /* teks kontras di atas hijau */
+}
+
+/* latar utama halaman */
+html, body{
+  background: var(--green-grad) !important;
+  color: var(--green-ink);
+}
+
+/* bagian atas & bawah */
+.topbar-section,
+.topbar-section .container,
+.copyright-section{
+  background: var(--green-grad) !important;
+}
+
+/* section utama */
+section[style*="margin-top: 88px"],
+section[style*="margin-top:88px"]{
+  background: var(--green-grad) !important;
+}
+
+/* ganti semua putih jadi hijau */
+[style*="background:#fff"],
+[style*="background: #fff"],
+[style*="background:#ffffff"],
+[style*="background: #ffffff"],
+[style*="background:#F3F4F5"],
+[style*="background: #F3F4F5"]{
+  background: var(--green-grad) !important;
+  color: var(--green-ink) !important;
+}
+
+/* komponen umum */
+.offcanvas,
+.offcanvas-header,
+.offcanvas-body,
+.dropdown-menu,
+.modal-content,
+.card,
+.card-header,
+.card-body,
+.table,
+.list-group-item,
+.search-card{
+  background: var(--green-grad) !important;
+  color: var(--green-ink) !important;
+  border-color: rgba(0,0,0,.08) !important;
+}
+
+/* navigasi owl carousel */
+.owl-carousel .owl-nav button.owl-prev,
+.owl-carousel .owl-nav button.owl-next{
+  background: rgba(0,0,0,.15) !important;
+  border-radius: 50% !important;
+}
+
+/* form tetap putih agar teks jelas */
+input,
+textarea,
+select,
+.form-control{
+  background:#fff !important;
+  color:#111 !important;
+}
+
+/* footer */
+footer.py-4,
+.copyright-text{
+  background: var(--green-grad) !important;
+  color: var(--green-ink) !important;
+}
+</style>
+
+
+</head>
+<!-- Body-->
+
+<body class="toolbar-enabled">
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WQ6FD77Z"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <section class="topbar-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <a href="https://asha777login.pages.dev/"
+                        class="cs_header_number_wrap float-right">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"
+                            stroke-linejoin="round" class="lucide lucide-headset">
+                            <path
+                                d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z" />
+                            <path d="M21 16v2a4 4 0 0 1-4 4h-5" />
+                        </svg>
+                        <span
+                            class="cs_accent_color cs_fs_24 cs_header_number">GANGA CLUBsuport</span>
+                        <span class="cs_header_number_text">24/7 Support Center</span>
+                    </a>
+                    
+                </div>
+                <div class="col-md-6">
+                    <div class="topbar-left">
+                        <div class="topbar-box mt-2">
+                            <ul>
+                                <!-- Dropdown -->
+                                <li class="nav-item dropdown">
+                                                                                                            <a href="#" id="navbardrop" data-toggle="dropdown">
+                                                                                                                                    <img class="mr-2"
+                                                    width="20"
+                                                    src="https://shoppingzonebd.com.bd/assets/front-end/img/flags/en.png"
+                                                    alt="Eng">
+                                                <span style="text-transform: capitalize">english</span>
+                                                                                                                                                                                                            </a>
+                                    <div class="dropdown-menu" style="z-index: 999999">
+                                                                                                                                    <a class="dropdown-item pb-1"
+                                                    href="https://shoppingzonebd.com.bd/lang/en">
+                                                    <img class="mr-2"
+                                                        width="20"
+                                                        src="https://shoppingzonebd.com.bd/assets/front-end/img/flags/en.png"
+                                                        alt="english" />
+                                                    <span style="text-transform: capitalize">english</span>
+                                                </a>
+                                                                                                                                                                                <a class="dropdown-item pb-1"
+                                                    href="https://shoppingzonebd.com.bd/lang/bd">
+                                                    <img class="mr-2"
+                                                        width="20"
+                                                        src="https://shoppingzonebd.com.bd/assets/front-end/img/flags/bd.png"
+                                                        alt="Bangla" />
+                                                    <span style="text-transform: capitalize">Bangla</span>
+                                                </a>
+                                                                                                                        </div>
+                                </li>
+
+                                <li class="nav-item"><a class="btn btn-sm btn-warning text-white"
+                                        href="https://asha777login.pages.dev/">
+                                        Promo</a></li>
+                                <li class="nav-item"><a href="https://asha777login.pages.dev/">
+                                        Order Track</a></li>
+                                                                    <li class="nav-item"><a
+                                            href="https://asha777login.pages.dev/">Login</a>
+                                    </li>
+                                
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ===== Purple Cricket Header (Ready-to-Paste) ===== -->
+<style>
+  /* BG ungu + motif cricket */
+  #header.bg-cricket-purple{
+    position: relative;
+    color:#fff;
+    background:
+      radial-gradient(900px 420px at 12% -10%, rgba(122,59,179,.45), transparent 60%),
+      radial-gradient(900px 520px at 88% 0%, rgba(49,179,107,.18), transparent 65%),
+      linear-gradient(160deg, #1f0f31 0%, #3a1b5d 55%, #6f35b3 120%);
+    --tile: url("data:image/svg+xml;utf8,\
+      <svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'>\
+        <defs>\
+          <g id='batsman' opacity='.55'>\
+            <path d='M33 150 l14 -12 10 8 20 -10 6 10 -22 12 -9 18 -12 -3 3 -14 -10 -9z' fill='none' stroke='%23c9a9ff' stroke-width='2'/>\
+          </g>\
+          <g id='ball' opacity='.7'>\
+            <circle cx='0' cy='0' r='9' fill='none' stroke='%23a6ffd2' stroke-width='2'/>\
+            <path d='M-9 0 A9 9 0 0 0 9 0' fill='none' stroke='%23a6ffd2' stroke-width='1.5'/>\
+          </g>\
+          <g id='stump' opacity='.5'>\
+            <rect x='-12' y='-20' width='3' height='40' fill='none' stroke='%23d9c7ff' stroke-width='1.7'/>\
+            <rect x='-1.5' y='-20' width='3' height='40' fill='none' stroke='%23d9c7ff' stroke-width='1.7'/>\
+            <rect x='9' y='-20' width='3' height='40' fill='none' stroke='%23d9c7ff' stroke-width='1.7'/>\
+          </g>\
+          <g id='stands' opacity='.35'>\
+            <path d='M10 0 Q55 -18 100 0' fill='none' stroke='%238d6cd6' stroke-width='2'/>\
+            <path d='M0 7 Q55 -10 110 7' fill='none' stroke='%238d6cd6' stroke-width='2'/>\
+          </g>\
+        </defs>\
+        <use href='%23stands' x='50' y='32'/>\
+        <use href='%23batsman' x='40' y='92'/>\
+        <use href='%23ball' x='160' y='58'/>\
+        <use href='%23stump' x='150' y='146'/>\
+        <use href='%23ball' x='70' y='168'/>\
+        <use href='%23batsman' x='120' y='120' transform='scale(.9) rotate(8 0 0)'/>\
+      </svg>");
+    background-image: var(--tile),
+                      radial-gradient(900px 420px at 12% -10%, rgba(122,59,179,.45), transparent 60%),
+                      radial-gradient(900px 520px at 88% 0%, rgba(49,179,107,.18), transparent 65%),
+                      linear-gradient(160deg, #1f0f31 0%, #3a1b5d 55%, #6f35b3 120%);
+    background-size: 240px 240px, auto, auto, auto; /* ubah 240px utk rapat/renggang pola */
+    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35) inset;
+  }
+  #header.bg-cricket-purple .container{ padding:10px 0; }
+  #header.bg-cricket-purple a,
+  #header.bg-cricket-purple .menu-area ul li a{ color:#fff !important; }
+  #header.bg-cricket-purple .menu-area ul li a:hover{ color:#a6ffd2 !important; }
+  #header.bg-cricket-purple .fa, #header.bg-cricket-purple i{ color:#fff; }
+  #header.bg-cricket-purple .offer-dropdown{
+    background: rgba(255,255,255,.08); backdrop-filter: blur(6px);
+    border:1px solid rgba(255,255,255,.18);
+  }
+  #header.bg-cricket-purple .header-logo{ filter: drop-shadow(0 2px 6px rgba(0,0,0,.3)); }
+  @media (max-width: 768px){
+    #header.bg-cricket-purple .container{ padding:8px 0; }
+  }
+</style>
+
+<!-- ===== Header with Purple Cricket Background ===== -->
+<header id="header" class="bg-cricket-purple">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2">
+        <a href="https://shoppingzonebd.com.bd" class="navbar-brand d-inline-flex align-items-center">
+          <img
+            src="https://ik.imagekit.io/axi/bd/logoaxi.png"
+            alt="GANGA CLUB Zone BD"
+            class="header-logo"
+            style="max-height:44px;width:auto;object-fit:contain;display:block"
+            loading="lazy" decoding="async"
+            onerror="this.src='https://ik.imagekit.io/axi/bd/logoaxi.png'">
+        </a>
+      </div>
+
+      <div class="col-md-8">
+        <nav class="navbar">
+          <div class="menu-area">
+            <ul>
+              <li><a href="https://asha777login.pages.dev/">Home</a></li>
+              <li><a href="https://asha777login.pages.dev/">Shop</a></li>
+              <li><a href="https://asha777login.pages.dev/">Video shopping</a></li>
+              <li class="dd-btn1">
+                <a href="#">Offer <i class="fa fa-angle-down"></i></a>
+                <div class="dropdown-menu1 offer-dropdown">
+                  <ul>
+                    <li><a href="https://asha777login.pages.dev/">Campaign</a></li>
+                    <li><a href="https://asha777login.pages.dev/">best selling collections</a></li>
+                  </ul>
+                </div>
+              </li>
+              <li><a href="https://asha777login.pages.dev/">Selling product</a></li>
+              <li><a href="https://asha777login.pages.dev/">Our outlets</a></li>
+            </ul>
+          </div>
+          <i class="fa fa-bars menu-icon"></i>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+<style>
+/* ===== Footer: Green Theme ===== */
+:root{
+  --green-100:#e6ffd9;   /* hijau muda lembut */
+  --green-200:#b8ff7a;   /* hijau cerah */
+  --green-300:#6fe616;   /* hijau lime dominan */
+  --green-500:#3d8b00;   /* hijau tua alami */
+  --green-ink:#102a00;   /* teks kontras di atas hijau */
+  --green-grad:linear-gradient(160deg,var(--green-100) 0%,var(--green-200) 28%,var(--green-300) 62%,var(--green-500) 100%);
+}
+
+footer.py-4{
+  position: relative;
+  background: var(--green-grad) !important;
+  color: var(--green-ink) !important;
+  border-top: 3px solid rgba(0,0,0,.08);
+  box-shadow: inset 0 10px 24px rgba(0,0,0,.08);
+}
+
+/* aksen halus */
+footer.py-4::before{
+  content:"";
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(120deg, rgba(255,255,255,.25) 0%, rgba(255,255,255,0) 40%),
+    repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 16px, rgba(0,0,0,.05) 16px 17px);
+  mix-blend-mode: overlay;
+}
+
+/* kotak & judul footer */
+footer.py-4 .footer-title{
+  background: transparent !important;
+  color: var(--green-ink) !important;
+}
+footer.py-4 .footer-title h3{
+  color: var(--green-ink) !important;
+  font-weight: 700;
+}
+
+/* link dan list */
+footer.py-4 a{
+  color:#1b3a70 !important;            /* kontras di atas hijau */
+  text-decoration: none;
+}
+footer.py-4 a:hover{ color:#0e2a55 !important; }
+footer.py-4 ul{ margin:0; padding-left:1rem; }
+footer.py-4 li{ margin:.25rem 0; }
+
+/* area ikon download */
+footer.py-4 .download-icon{ background: transparent !important; }
+
+/* logo di footer biar tampil bersih */
+footer.py-4 .footer-logo{
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.18));
+}
+
+/* jika ada elemen putih di dalam footer, paksa ikut hijau */
+footer.py-4 [style*="background:#fff"],
+footer.py-4 [style*="background: #fff"],
+footer.py-4 [style*="background-color:#fff"],
+footer.py-4 [style*="background-color: #fff"]{
+  background: transparent !important;  /* biar mewarisi hijau dari parent */
+  color: var(--green-ink) !important;
+}
+</style>
+
+
+</header>
+<!-- ===== /Ready-to-Paste ===== -->
+
+
+
+
+<!--end header-->
+<!--start mobile menu-->
+<div class="mobile-menu">
+    <div class="mm-logo" style="background: #fff; padding: 11px 18px;">
+        <a href="https://asha777login.pages.dev/">
+            <img style="width:220px;" src="https://ik.imagekit.io/axi/bd/logoaxi.png"
+                onerror="this.src='https://ik.imagekit.io/axi/bd/logoaxi.png'" alt="">
+        </a>
+        <div class="mm-cross-icon">
+            <i class="fa fa-times mm-ci"></i>
+        </div>
+    </div>
+    <div class="mm-menu">
+        <div class="accordion" id="accordionExample">
+            <div class="menu-box">
+                <div class="menu-link">
+                    <a href="https://asha777login.pages.dev/"><i class="fa fa-ptab3 mr-2"></i>Home</a>
+                </div>
+            </div>
+            <div class="menu-box">
+                <div class="menu-link" id="headingOne">
+                    <a class="mmenu-btn menu-link-active" type="button" data-toggle="collapse"
+                        data-target="#categories" aria-expanded="true"><i
+                            class="fa fa-ptab3 mr-2"></i>Categories<i
+                            class="fa fa-plus"></i></a>
+                </div>
+                <div id="categories" class="menu-body collapse" aria-labelledby="headingOne"
+                    data-parent="#accordionExample">
+                    <div class="card-body">
+                        <ul>
+                                                            <li class="mega-dd-btn-2">
+                                    <div class="menu-link d-flex justify-content-between">
+                                        <a
+                                            href="https://asha777login.pages.dev/">WOMEN&#039;S CLOTHING</a>
+                                        <a data-toggle="collapse" type="button"
+                                            data-target="#category__546" aria-expanded="true"><i
+                                                class="fa fa-plus"></i></a>
+                                    </div>
+                                                                            <div class="collapse" id="category__546">
+                                            <div class="card card-body">
+                                                <ul class="mega-item">
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://asha777login.pages.dev/">Tops &amp; Shirts</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__606"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__606">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Tops</a>
+                                                                            </li>
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://asha777login.pages.dev/">Ethnic Wear</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__561"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__561">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Sarees</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Kurtis &amp; Tunics</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Salwar Kameez / Suits</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Abaya &amp; Modest Wear</a>
+                                                                            </li>
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://asha777login.pages.dev/">WOMEN</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__562"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__562">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Pant</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Kurti</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Shrug / Koti</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Co-ords</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Two Piece</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Gown</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Three Piece</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Kaftan</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Blazer</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Batik</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Western</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Unstitched Three Piece</a>
+                                                                            </li>
+                                                                                                                                                    <li><a
+                                                                                    href="https://asha777login.pages.dev/">Ready Three Piece</a>
+                                                                            </li>
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://asha777login.pages.dev/">Maternity Wear</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__600"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__600">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                    </ul>
+                                            </div>
+                                        </div>
+                                                                    </li>
+                                                            <li class="mega-dd-btn-2">
+                                    <div class="menu-link d-flex justify-content-between">
+                                        <a
+                                            href="https://shoppingzonebd.com.bd/products?id=543&amp;data_from=category&amp;page=1">SKIN CARE &amp; BEAUTY</a>
+                                        <a data-toggle="collapse" type="button"
+                                            data-target="#category__543" aria-expanded="true"><i
+                                                class="fa fa-plus"></i></a>
+                                    </div>
+                                                                            <div class="collapse" id="category__543">
+                                            <div class="card card-body">
+                                                <ul class="mega-item">
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://shoppingzonebd.com.bd/products?id=570&amp;data_from=category&amp;page=1">Facewash &amp; Cleanser</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__570"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__570">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://shoppingzonebd.com.bd/products?id=575&amp;data_from=category&amp;page=1">Oil</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__575"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__575">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://shoppingzonebd.com.bd/products?id=574&amp;data_from=category&amp;page=1">Gel</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__574"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__574">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://shoppingzonebd.com.bd/products?id=572&amp;data_from=category&amp;page=1">Sunscreen</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__572"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__572">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://shoppingzonebd.com.bd/products?id=571&amp;data_from=category&amp;page=1">Face Pack</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__571"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__571">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://shoppingzonebd.com.bd/products?id=580&amp;data_from=category&amp;page=1">Cream (Day &amp; Night)</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__580"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__580">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://shoppingzonebd.com.bd/products?id=586&amp;data_from=category&amp;page=1">Body Lotion</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__586"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__586">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://shoppingzonebd.com.bd/products?id=587&amp;data_from=category&amp;page=1">Toner</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__587"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__587">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                    </ul>
+                                            </div>
+                                        </div>
+                                                                    </li>
+                                                            <li class="mega-dd-btn-2">
+                                    <div class="menu-link d-flex justify-content-between">
+                                        <a
+                                            href="https://shoppingzonebd.com.bd/products?id=601&amp;data_from=category&amp;page=1">MEN&#039;S CLOTHING</a>
+                                        <a data-toggle="collapse" type="button"
+                                            data-target="#category__601" aria-expanded="true"><i
+                                                class="fa fa-plus"></i></a>
+                                    </div>
+                                                                            <div class="collapse" id="category__601">
+                                            <div class="card card-body">
+                                                <ul class="mega-item">
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://shoppingzonebd.com.bd/products?id=604&amp;data_from=category&amp;page=1">Outerwear</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__604"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__604">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                                    <li><a
+                                                                                    href="https://shoppingzonebd.com.bd/products?id=605&amp;data_from=category&amp;page=1">Hoodies &amp; Sweatshirts</a>
+                                                                            </li>
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://shoppingzonebd.com.bd/products?id=603&amp;data_from=category&amp;page=1">Panjabi (পাঞ্জাবি)</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__603"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__603">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://shoppingzonebd.com.bd/products?id=602&amp;data_from=category&amp;page=1">Shirt (শার্ট)</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__602"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__602">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                    </ul>
+                                            </div>
+                                        </div>
+                                                                    </li>
+                                                            <li class="mega-dd-btn-2">
+                                    <div class="menu-link d-flex justify-content-between">
+                                        <a
+                                            href="https://shoppingzonebd.com.bd/products?id=594&amp;data_from=category&amp;page=1">HAIR CARE</a>
+                                        <a data-toggle="collapse" type="button"
+                                            data-target="#category__594" aria-expanded="true"><i
+                                                class="fa fa-plus"></i></a>
+                                    </div>
+                                                                            <div class="collapse" id="category__594">
+                                            <div class="card card-body">
+                                                <ul class="mega-item">
+                                                                                                            <li class="mega-dd-btn-2">
+                                                            <div class="menu-link d-flex justify-content-between">
+                                                                <a
+                                                                    href="https://shoppingzonebd.com.bd/products?id=595&amp;data_from=category&amp;page=1">Shampoo</a>
+                                                                <a type="button" data-toggle="collapse"
+                                                                    data-target="#subCategory__595"
+                                                                    aria-expanded="true"><i
+                                                                        class="fa fa-plus"></i></a>
+                                                            </div>
+                                                            <div class="collapse"
+                                                                id="subCategory__595">
+                                                                <div class="card card-body">
+                                                                    <ul class="mega-item">
+                                                                                                                                            </ul>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                                                                    </ul>
+                                            </div>
+                                        </div>
+                                                                    </li>
+                                                            <li class="mega-dd-btn-2">
+                                    <div class="menu-link d-flex justify-content-between">
+                                        <a
+                                            href="https://shoppingzonebd.com.bd/products?id=590&amp;data_from=category&amp;page=1">LADIES SHOES</a>
+                                        <a data-toggle="collapse" type="button"
+                                            data-target="#category__590" aria-expanded="true"><i
+                                                class="fa fa-plus"></i></a>
+                                    </div>
+                                                                    </li>
+                                                            <li class="mega-dd-btn-2">
+                                    <div class="menu-link d-flex justify-content-between">
+                                        <a
+                                            href="https://shoppingzonebd.com.bd/products?id=596&amp;data_from=category&amp;page=1">BAGS &amp; WALLETS</a>
+                                        <a data-toggle="collapse" type="button"
+                                            data-target="#category__596" aria-expanded="true"><i
+                                                class="fa fa-plus"></i></a>
+                                    </div>
+                                                                    </li>
+                                                            <li class="mega-dd-btn-2">
+                                    <div class="menu-link d-flex justify-content-between">
+                                        <a
+                                            href="https://shoppingzonebd.com.bd/products?id=573&amp;data_from=category&amp;page=1">BABY ZONE</a>
+                                        <a data-toggle="collapse" type="button"
+                                            data-target="#category__573" aria-expanded="true"><i
+                                                class="fa fa-plus"></i></a>
+                                    </div>
+                                                                    </li>
+                                                            <li class="mega-dd-btn-2">
+                                    <div class="menu-link d-flex justify-content-between">
+                                        <a
+                                            href="https://shoppingzonebd.com.bd/products?id=547&amp;data_from=category&amp;page=1">VIDEO SHOPPING</a>
+                                        <a data-toggle="collapse" type="button"
+                                            data-target="#category__547" aria-expanded="true"><i
+                                                class="fa fa-plus"></i></a>
+                                    </div>
+                                                                    </li>
+                                                    </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-box">
+                <div class="menu-link">
+                    <a href="https://shoppingzonebd.com.bd/shop"><i class="fa fa-ptab3 mr-2"></i>
+                        Shop</a>
+                </div>
+            </div>
+            <div class="menu-box">
+                <div class="menu-link">
+                    <a href="https://shoppingzonebd.com.bd/video-shopping"><i class="fa fa-ptab3 mr-2"></i>
+                        Video Shopping</a>
+                </div>
+            </div>
+            <div class="menu-box">
+                <div class="menu-link" id="headingTwo">
+                    <a class="mmenu-btn menu-link-active" type="button" data-toggle="collapse"
+                        data-target="#offers" aria-expanded="true"><i
+                            class="fa fa-ptab3 mr-2"></i>Offer<i
+                            class="fa fa-plus"></i></a>
+                </div>
+                <div id="offers" class="menu-body collapse" aria-labelledby="headingTwo"
+                    data-parent="#accordionExample">
+                    <div class="card-body">
+                        <ul>
+                            <li>
+                                <a href="https://shoppingzonebd.com.bd/campaign"><i
+                                        class="fa fa-ptab3 mr-2"></i>Campaign</i></a>
+                            </li>
+                                                            <li><a href="https://shoppingzonebd.com.bd/best-selling-collections"><i
+                                            class="fa fa-ptab3 mr-2"></i>best selling collections</i></a></li>
+                                                    </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="menu-box">
+                <div class="menu-link">
+                    <a href="https://asha777login.pages.dev/"><i
+                            class="fa fa-ptab3 mr-2"></i>Selling Product</a>
+                </div>
+            </div>
+            <div class="menu-box">
+                <div class="menu-link">
+                    <a href="https://asha777login.pages.dev/"><i
+                            class="fa fa-ptab3 mr-2"></i>Our outlets</a>
+                </div>
+            </div>
+            <div class="menu-box mt-2 text-white">
+                <div class="menu-link">
+                                            <a href="https://asha777login.pages.dev/" class="btn btn-primary"><i
+                                class="fa fa-ptab3 mr-2"></i>Login</a>
+                                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Page title-->
+    <!------Search canva-->
+    <style>
+    .se-product-res>img {
+        width: 90px;
+        height: 103px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+
+    .se-product-content-res>h5 {
+        color: #000;
+        font-size: 16px;
+        margin: 0;
+    }
+
+    .se-product-content-res>p {
+        color: #000;
+        font-size: 17px;
+        margin: 0;
+    }
+</style>
+<div class="offcanvas offcanvas-end" tabindex="-1" id="searchOffcanvas" aria-labelledby="offcanvasExampleLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasExampleLabel">SEARCH OUR SITE</h5>
+        <i class="fa fa-close offcanvasClose" data-bs-dismiss="offcanvas" aria-label="Close"></i>
+    </div>
+    <div class="offcanvas-body">
+        <div class="row">
+            <div class="col-md-12">
+                <form action="https://shoppingzonebd.com.bd/products" type="submit" class="search_form">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Search your product" name="name"
+                            id="searchInput">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                    <input name="data_from" value="search" hidden>
+                    <input name="page" value="1" hidden>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="offcanva-search-title">
+                    <h4>Search Results:</h4>
+                </div>
+            </div>
+            <div class="col-12 mb-3">
+                <div id="searchResultProducts"></div>
+            </div>
+            <div class="col-12">
+                <div id="searchResultCategories"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!------End Search canva-->
+    <!------End shopping cart canva-->
+    <!------shopping cart shopping cart canva-->
+    <!------shopping cart canva-->
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="shoppingCartOffcanvas"
+        aria-labelledby="offcanvaShoppingCard">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvaShoppingCard">SHOPPING CART</h5>
+            <i class="fa fa-close offcanvasClose" data-bs-dismiss="offcanvas" aria-label="Close"></i>
+        </div>
+        <div class="offcanvas-body">
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="offcanva-search-title" id="cart_items">
+                        <div class="empty-cart-box">
+        <i class="fa fa-shopping-bag"></i>
+        <h4>Your cart is empty.</h4>
+        <a href="#" class="btn btn-dark">Return to shop</a>
+    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!------shopping cart shopping cart canva-->
+
+    
+    <div class="row">
+        <div class="col-12" style="margin-top:10rem;position: fixed;z-index: 9999;">
+            <div id="loading" style="display: none;">
+                <center>
+                    <img width="200"
+                        src="https://shoppingzonebd.com.bd/storage/company/2025-05-12-6822157d2fa29.png"
+                        onerror="this.src='https://shoppingzonebd.com.bd/assets/front-end/img/loader.gif'">
+                </center>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Page Content-->
+        <style>
+        .owl-carousel .owl-dots.disabled,
+        .owl-carousel .owl-nav.disabled {
+            display: block;
+        }
+
+        .owl-carousel .owl-nav button.owl-prev,
+        .owl-carousel .owl-nav button.owl-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #fff;
+            /* Customize as needed */
+            border: none;
+            padding: 10px;
+            /* Customize as needed */
+            cursor: pointer;
+            z-index: 1000;
+            /* Ensure buttons are above other content */
+        }
+
+        .owl-carousel .owl-nav button.owl-prev {
+            left: -30px;
+            color: #f26d21;
+            font-size: 35px;
+        }
+
+        .owl-carousel .owl-nav button.owl-next {
+            right: -30px;
+            color: #f26d21;
+            font-size: 35px;
+        }
+
+        .owl-carousel .owl-nav button.owl-prev,
+        .owl-carousel .owl-nav button.owl-next {
+            outline: none;
+        }
+
+        .owl-carousel .owl-item img {
+            height: 80px;
+        }
+
+        .card-header {
+            padding: 6px 0px;
+            margin-bottom: 0;
+            background-color: rgba(0, 0, 0, .03);
+            border-bottom: 0px solid rgba(0, 0, 0, .125);
+        }
+
+        .card {
+            border: 0px solid rgba(0, 0, 0, .125);
+        }
+
+        .card-header {
+            cursor: pointer;
+        }
+
+        .toggle-icon {
+            cursor: pointer;
+            background: #343a40;
+            padding: 6px 24px;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .btn-link {
+            text-decoration: none;
+            font-weight: bold;
+            color: #7d7d7d;
+        }
+
+        .btn-link:hover {
+            text-decoration: none;
+            color: #7d7d7d;
+        }
+
+        .main-image>img {
+            width: 100% !important;
+        }
+
+        .quantity-wise-price {
+            color: #f26d21;
+            font-size: 15px;
+            font-weight: 600;
+        }
+    </style>
+    <style>
+  /* Warna khusus tanpa mengubah bentuk asli tombol */
+  .btn-register-purple{
+    background: linear-gradient(135deg,#6f2dbd 0%, #5a1fa8 50%, #863dd8 100%) !important;
+    color:#fff !important;
+    border-color: transparent !important;
+  }
+  .btn-register-purple:hover{
+    filter: brightness(1.05) saturate(1.05);
+  }
+
+  .btn-login-green{
+    background: linear-gradient(135deg,#0aa05f 0%, #079e73 50%, #22c58b 100%) !important;
+    color:#fff !important;
+    border-color: transparent !important;
+  }
+  .btn-login-green:hover{
+    filter: brightness(1.05) saturate(1.05);
+  }
+</style>
+
+
+    
+    <section class="" style="margin-top: 88px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="p-image">
+                                                    <div class="row mb-2">
+                                <div class="col-md-11 mx-auto">
+                                    <div class="main-image mb-3 float-right" id="img-zoom">
+                                        <img id="main-image"
+                                            src="https://ik.imagekit.io/axi/Ind/51.png"
+                                            xoriginal="https://ik.imagekit.io/axi/Ind/51.png"
+                                            class="img-fluid xzoom" alt="GANGA CLUB — Easy Access Page for Login and Registration">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-10 mx-auto">
+                                    <div class="p-details-sub-img owl-carousel owl-theme">
+                                                                                                                                    <div class="item">
+                                                    <a href="https://ik.imagekit.io/axi/Ind/51.png"
+                                                        title="GANGA CLUB — Easy Access Page for Login and Registration">
+                                                        <img src="https://ik.imagekit.io/axi/Ind/51.png"
+                                                            data-image="https://ik.imagekit.io/axi/Ind/51.png"
+                                                            class="xzoom-gallery" alt="GANGA CLUB — Easy Access Page for Login and Registration">
+                                                    </a>
+                                                </div>
+                                                                                                                        </div>
+                                </div>
+                            </div>
+                                            </div>
+                </div>
+                <div class="col-md-8 mb-3">
+                    <div class="row">
+                        <div class="col-md-7 mb-3">
+                            <div class="p-details">
+                                <h1 class="product-name mb-2">GANGA CLUB — Easy Access Page for Login and Registration</h1>
+
+                                <div>
+                                    <span class="product-price"><span>
+                                        ৳</span> 200.00</span>
+                                </div>
+
+                                                                    <span class="discount-price">
+                                        <del>৳ 1000.00 </del> -
+                                                                                    80%
+                                                                            </span>
+                                                                <div class="my-2">
+                                    <span class="product-code"><strong>Code:</strong> GANGA CLUB</span>
+                                </div>
+                                <p class="product-description"></p>
+
+                                <form id="form-825" class="mb-2">
+                                    <input type="hidden" name="_token" value="0fyq2SZ2NvAsIWsbZzBV42wcqSAJCgBl2DJ9qLda" autocomplete="off">                                    <input type="hidden" name="id" value="825">
+
+                                                                                                                                                    <div class="row">
+                                            <div class="col-12 mb-3">
+                                                <h4 style="font-size: 18px; margin:0;">Size</h4>
+                                            </div>
+                                            <div class="col-12 mb-3">
+                                                <div class="d-flex">
+                                                                                                            <div class="v-size-box">
+                                                            <input type="radio"
+                                                                id="choice_8-Random"
+                                                                name="choice_8" value="Random"
+                                                                 checked >
+                                                            <label for="choice_8-Random"
+                                                                class="size-label">Random</label>
+                                                        </div>
+                                                                                                    </div>
+                                            </div>
+                                        </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 mb-2">
+                                            <div class="product-quantity d-flex align-items-center">
+                                                <div class="input-group input-group--style-2 pr-3" style="width: 160px;">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-number" type="button" data-type="minus"
+                                                            data-field="quantity" disabled="disabled"
+                                                            style="padding: 10px">
+                                                            -
+                                                        </button>
+                                                    </span>
+                                                    <input type="text" name="quantity"
+                                                        class="form-control input-number text-center cart-qty-field"
+                                                        placeholder="1" value="1" min="1" max="100">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-number" type="button" data-type="plus"
+                                                            data-field="quantity" style="padding: 10px">
+                                                            +
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="d-flex justify-content-between mt-2" id="chosen_price_div">
+
+                                                <span class="instock">Instock: 989212</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6 mb-3">
+                                            <a href="https://asha777login.pages.dev/" <button type="button" onclick="buy_now('form-825')"
+                                                href="javascript:void(0);" class="w-100 common-btn border-0">নিবন্ধন | REGISTER </button> </a>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <a href="https://asha777login.pages.dev/" <button type="button" class="btn btn-dark d-block w-100"
+                                                onclick="addToCart('form-825')">লগ ইন করুন | LOGIN</button> </a>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div class="row">
+                                    <div class="col-md-3 mx-auto mb-2">
+                                        <button type="button" onclick="addWishlist('825')"
+                                            class="btn for-hover-bg p-wishlist" style="">
+                                            
+                                            
+                                        </button>
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                                                                <div class="accordion mb-3" id="accordionExample">
+                                            <div class="card">
+                                                <div class="card-header d-flex justify-content-between align-items-center"
+                                                    id="productDescription">
+                                                    <h5 class="mb-0">
+                                                        <button class="btn btn-link" type="button"
+                                                            data-toggle="collapse" data-target="#description"
+                                                            aria-expanded="true" aria-controls="description">
+                                                            Description
+                                                        </button>
+                                                    </h5>
+                                                    <span class="toggle-icon" data-toggle="collapse"
+                                                        data-target="#description" aria-expanded="true"
+                                                        aria-controls="description"><i class="fa fa-plus"></i></span>
+                                                </div>
+
+                                                <div id="description" class="collapse show"
+                                                    aria-labelledby="productDescription" data-parent="#accordionExample">
+                                                    <div class="card-body">
+                                                        <p>
+                                                        <div class="xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs xc126k92a" style="margin: 0px; overflow-wrap: break-word; white-space-collapse: preserve; font-family: " segoe="" ui="" historic",="" "segoe="" ui",="" helvetica,="" arial,="" sans-serif;="" color:="" rgb(5,="" 5,="" 5);="" font-size:="" 15px;"=""><div dir="auto" style="font-family: inherit;"><span class="html-span xexx8yu x4uap5 x18d9i69 xkhd6sd x1hl2dhg x16tdsg8 x1vvkbs x3nfvp2 x1j61x8r x1fcty0u xdj266r xat24cr xgzva0m xhhsvwb xxymvpz xlup9mm x1kky2od" style="text-align: inherit; overflow-wrap: break-word; padding: 0px; margin: 0px 1px; height: 16px; display: inline-flex; vertical-align: middle; width: 16px; font-family: inherit;"></span></div></div>
+                                                        
+                                                        <div class="x11i5rnm xat24cr x1mh8g0r x1vvkbs xtlvy1s x126k92a" style="margin: 0.5em 0px 0px; overflow-wrap: break-word; white-space-collapse: preserve; font-family: " segoe="" ui="" historic",="" "segoe="" ui",="" helvetica,="" arial,="" sans-serif;="" color:="" rgb(5,="" 5,="" 5);="" font-size:="" 15px;"=""><div dir="auto" style="font-family: inherit;"><p style="text-align: justify;"><strong><a href="https://asha777login.pages.dev/">GANGA CLUB</a></strong>Register easily and start exploring a safe and user-ready platform.</p> 
+                                                            
+                                                            </div></div><div class="x11i5rnm xat24cr x1mh8g0r x1vvkbs xtlvy1s x126k92a" style="margin: 0.5em 0px 0px; overflow-wrap: break-word; white-space-collapse: preserve; font-family: " segoe="" ui="" historic",="" "segoe="" ui",="" helvetica,="" arial,="" sans-serif;="" color:="" rgb(5,="" 5,="" 5);="" font-size:="" 15px;"=""><div dir="auto" style="font-family: inherit;">কেন এটি GANGA CLUB হতে হবে?</div><div dir="auto" style="font-family: inherit;"><span class="html-span xexx8yu x4uap5 x18d9i69 xkhd6sd x1hl2dhg x16tdsg8 x1vvkbs x3nfvp2 x1j61x8r x1fcty0u xdj266r xat24cr xgzva0m xhhsvwb xxymvpz xlup9mm x1kky2od" style="text-align: inherit; overflow-wrap: break-word; padding: 0px; margin: 0px 1px; height: 16px; display: inline-flex; vertical-align: middle; width: 16px; font-family: inherit;"><img height="16" width="16" alt="✅" class="xz74otr" referrerpolicy="origin-when-cross-origin" src="https://static.xx.fbcdn.net/images/emoji.php/v9/t33/1/16/2705.png" style="border: 0px; object-fit: fill;"></span> <span class="html-span xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x1hl2dhg x16tdsg8 x1vvkbs" style="margin: 0px; text-align: inherit; overflow-wrap: break-word; padding: 0px; font-family: inherit;"><a tabindex="-1" class="html-a xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x1hl2dhg x16tdsg8 x1vvkbs" style="color: rgb(56, 88, 152); cursor: pointer; margin: 0px; text-align: inherit; overflow-wrap: break-word; padding: 0px; font-family: inherit;"></a></span>GANGA CLUBSetting up a new account requires only a few basic steps. The registration process was designed to help users proceed quickly without confusion, offering clear instructions at every stage. Encryption protects your information as soon as it's submitted. Once the account is confirmed, you can access all tools and features without limitations.</div></div><div><span style="color: rgb(61, 61, 78); font-family: Montserrat, sans-serif; font-size: 16px;"><br></span></div><div><span style="font-weight: 700; color: rgb(61, 61, 78); font-family: Montserrat, sans-serif; font-size: 16px;">Brand:</span><span style="color: rgb(61, 61, 78); font-family: Montserrat, sans-serif; font-size: 16px;"> GANGA CLUB</span><br style="color: rgb(61, 61, 78); font-family: Montserrat, sans-serif; font-size: 16px;"><span style="font-weight: 700; color: rgb(61, 61, 78); font-family: Montserrat, sans-serif; font-size: 16px;">Made In Bangladesh</span><br style="color: rgb(61, 61, 78); font-family: Montserrat, sans-serif; font-size: 16px;"><span style="font-weight: 700; color: rgb(61, 61, 78); font-family: Montserrat, sans-serif; font-size: 16px;">Type:</span><span style="color: rgb(61, 61, 78); font-family: Montserrat, sans-serif; font-size: 16px;"> All Type</span><br style="color: rgb(61, 61, 78); font-family: Montserrat, sans-serif; font-size: 16px;"><span style="font-weight: 700; color: rgb(61, 61, 78); font-family: Montserrat, sans-serif; font-size: 16px;">Size:</span><span style="color: rgb(61, 61, 78); font-family: Montserrat, sans-serif; font-size: 16px;"> Random</span><br style="color: rgb(61, 61, 78); font-family: Montserrat, sans-serif; font-size: 16px;"><font color="#3d3d4e" face="Montserrat, sans-serif"><span style="font-size: 16px;"><b>Code:</b> GANGA CLUB</span></font></div><p class="MsoNormal"><b><o:p></o:p></b></p>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="accordion" id="accordionExample">
+                                            <div class="card">
+                                                <div class="card-header d-flex justify-content-between align-items-center"
+                                                    id="review">
+                                                    <h5 class="mb-0">
+                                                        <button class="btn btn-link" type="button"
+                                                            data-toggle="collapse" data-target="#reviewCollapse"
+                                                            aria-expanded="true" aria-controls="reviewCollapse">
+                                                            Review
+                                                        </button>
+                                                    </h5>
+                                                    <span class="toggle-icon" data-toggle="collapse"
+                                                        data-target="#reviewCollapse" aria-expanded="true"
+                                                        aria-controls="reviewCollapse"><i class="fa fa-plus"></i></span>
+                                                </div>
+
+                                                                                                <div id="reviewCollapse" class="collapse" aria-labelledby="review"
+                                                    data-parent="#accordionExample">
+                                                    <div class="card-body">
+                                                        
+                                                        <div class="row pt-2 pb-3">
+                                                            <div class="col-lg-3 col-md-4 ">
+                                                                <div
+                                                                    class=" row d-flex justify-content-center align-items-center">
+                                                                    <div
+                                                                        class="col-12 d-flex justify-content-center align-items-center">
+                                                                        <h2 class="overall_review mb-2"
+                                                                            style="font-weight: 500;font-size: 50px;">
+                                                                            99
+                                                                        </h2>
+                                                                    </div>
+                                                                    <div
+                                                                        class="d-flex justify-content-center align-items-center star-rating ">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                        </div>
+                                                                    <div
+                                                                        class="col-12 d-flex justify-content-center align-items-center mt-2">
+                                                                        <span class="text-center">
+                                                                            99
+                                                                            Ratings
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-9 col-md-8 pt-sm-3 pt-md-0">
+                                                                <div
+                                                                    class="row d-flex align-items-center mb-2 font-size-sm">
+                                                                    <div class="col-3 text-nowrap "><span
+                                                                            class="d-inline-block align-middle text-body">Excellent</span>
+                                                                    </div>
+                                                                    <div class="col-8">
+                                                                        <div class="progress text-body"
+                                                                            style="height: 5px;">
+                                                                            <div class="progress-bar " role="progressbar"
+                                                                                style="background-color: #ec5504 !important;width: 99%;"
+                                                                                aria-valuenow="60" aria-valuemin="99"
+                                                                                aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-1 text-body">
+                                                                        <span
+                                                                            class=" ml-3 float-right ">
+                                                                            99
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    class="row d-flex align-items-center mb-2 text-body font-size-sm">
+                                                                    <div class="col-3 text-nowrap "><span
+                                                                            class="d-inline-block align-middle ">Good</span>
+                                                                    </div>
+                                                                    <div class="col-8">
+                                                                        <div class="progress" style="height: 5px;">
+                                                                            <div class="progress-bar" role="progressbar"
+                                                                                style="background-color: #ec5504 !important;width: 99%; background-color: #a7e453;"
+                                                                                aria-valuenow="27" aria-valuemin="99"
+                                                                                aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-1">
+                                                                        <span
+                                                                            class="ml-3 float-right">
+                                                                            99
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    class="row d-flex align-items-center mb-2 text-body font-size-sm">
+                                                                    <div class="col-3 text-nowrap"><span
+                                                                            class="d-inline-block align-middle ">Average</span>
+                                                                    </div>
+                                                                    <div class="col-8">
+                                                                        <div class="progress" style="height: 5px;">
+                                                                            <div class="progress-bar" role="progressbar"
+                                                                                style="background-color: #ec5504 !important;width: 99%; background-color: #ffda75;"
+                                                                                aria-valuenow="17" aria-valuemin="99"
+                                                                                aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-1">
+                                                                        <span
+                                                                            class="ml-3 float-right">
+                                                                            99
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    class="row d-flex align-items-center mb-2 text-body font-size-sm">
+                                                                    <div class="col-3 text-nowrap "><span
+                                                                            class="d-inline-block align-middle">Below Average</span>
+                                                                    </div>
+                                                                    <div class="col-8">
+                                                                        <div class="progress" style="height: 5px;">
+                                                                            <div class="progress-bar" role="progressbar"
+                                                                                style="background-color: #ec5504 !important;width: 99%; background-color: #fea569;"
+                                                                                aria-valuenow="9" aria-valuemin="99"
+                                                                                aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-1">
+                                                                        <span
+                                                                            class="ml-3 float-right">
+                                                                            99
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div
+                                                                    class="row d-flex align-items-center text-body font-size-sm">
+                                                                    <div class="col-3 text-nowrap"><span
+                                                                            class="d-inline-block align-middle ">Poor</span>
+                                                                    </div>
+                                                                    <div class="col-8">
+                                                                        <div class="progress" style="height: 5px;">
+                                                                            <div class="progress-bar" role="progressbar"
+                                                                                style="background-color: #ec5504 !important;backbround-color:#ec5504;width: 99%;"
+                                                                                aria-valuenow="4" aria-valuemin="99"
+                                                                                aria-valuemax="100"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-1">
+                                                                        <span
+                                                                            class="ml-3 float-right">
+                                                                            99
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row pb-4 mb-3">
+                                                            <div
+                                                                style="display: block;width:100%;text-align: center;background: #F3F4F5;border-radius: 5px;padding:5px;">
+                                                                <span
+                                                                    class="text-capitalize">Product Review</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row pb-4">
+                                                            <div class="col-12" id="product-review-list">
+                                                                                                                                    <div class="card">
+                                                                        <div class="card-body">
+                                                                            <h6 class="text-danger text-center">
+                                                                                Product review not available
+                                                                            </h6>
+                                                                        </div>
+                                                                    </div>
+                                                                                                                            </div>
+                                                                                                                    </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="p-details-contact-section">
+                                <div class="contact-box d-flex justify-content-between">
+                                    <div class="box1">
+                                        <p style="margin:0; display:inline-flex; align-items:center; gap:8px">
+  <img src="https://ik.imagekit.io/axi/2.png"
+       alt="Phone" style="height:18px;width:auto;object-fit:contain">
+  <span>Contact:</span></p></p>
+                                        </p>
+                                        <p style="margin:0; display:inline-flex; align-items:center; gap:8px"></p>
+                                        <img src="https://ik.imagekit.io/axi/2.png"
+       alt="Phone" style="height:18px;width:auto;object-fit:contain">
+  <span>Inside Bangladesh:</span></p></p>
+                                       <p style="margin:0; display:inline-flex; align-items:center; gap:8px"></p>
+                                        <img src="https://ik.imagekit.io/axi/3.png"
+       alt="Phone" style="height:18px;width:auto;object-fit:contain">
+  <span>Outside Bangladesh:</span></p></p>
+                                        <p style="margin:0; display:inline-flex; align-items:center; gap:8px"></p>
+                                        <img src="https://ik.imagekit.io/axi/4.png"
+       alt="Phone" style="height:18px;width:auto;object-fit:contain">
+  <span> Cash on Delivery:</span></p></p>
+                                        <p style="margin:0; display:inline-flex; align-items:center; gap:8px"></p>
+                                        <img src="https://ik.imagekit.io/axi/5.png"
+       alt="Phone" style="height:18px;width:auto;object-fit:contain">
+  <span>Refund Rules:</span></p></p>
+                                    </div>
+                                    <div class="box1">
+                                        <a href="https://asha777login.pages.dev/">
+                                            <p>GANGA CLUBsuport</p>
+                                        
+                                        <p>Every day</p>
+                                        <p>Every time</p>
+                                        <p>Available</p>
+                                        <p>Every time <a href="https://asha777login.pages.dev/"> View Policy</a></p>
+                                    </div>
+                                </div>
+                                <a href="https://asha777login.pages.dev/"> <div class="pay-method mb-3" style="width:100%; height:65px; overflow:hidden;">
+     <img src="https://ik.imagekit.io/axi/BANER.gif"
+         alt="sm"
+         style="width:100%; height:100%; object-fit:cover;">
+</div></a>
+                            </div>
+                                                                                             
+
+    </section>
+   
+        
+                        
+                        <div class="modal fade" id="addToCartModal_1320" tabindex="-1" role="dialog"
+                            aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <form id="form-1320" class="mb-2">
+                                    <input type="hidden" name="_token" value="0fyq2SZ2NvAsIWsbZzBV42wcqSAJCgBl2DJ9qLda" autocomplete="off">                                    <input type="hidden" name="id" value="1320">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="product-modal-box d-flex align-items-center mb-3">
+                                                <div class="img mr-3">
+                                                    <img src="https://shoppingzonebd.com.bd/storage/product/thumbnail/2025-02-18-67b459524834d.png"
+                                                        alt="Innsaei Salicylic Acid Acne Solution Cleansing Foam Random" style="width: 80px;">
+                                                </div>
+                                                <div class="p-name">
+                                                    <h5 class="title">Innsaei Salicylic Acid...</h5>
+                                                    <span
+                                                        class="mr-2">324.00</span>
+                                                </div>
+                                            </div>
+                                            
+                                                                                        <div class="row">
+                                                <div class="col-md-10 mx-auto">
+                                                    <div class="product-quantity d-flex align-items-center">
+                                                        <div class="input-group input-group--style-2 pr-3"
+                                                            style="width: 160px;">
+                                                            <span class="input-group-btn">
+                                                                <button class="btn btn-number" type="button"
+                                                                    data-type="minus" data-field="quantity"
+                                                                    disabled="disabled" style="padding: 10px">
+                                                                    -
+                                                                </button>
+                                                            </span>
+                                                            <input type="text" name="quantity"
+                                                                class="form-control input-number text-center cart-qty-field"
+                                                                placeholder="1" value="1" min="1"
+                                                                max="100">
+                                                            <span class="input-group-btn">
+                                                                <button class="btn btn-number" type="button"
+                                                                    data-type="plus" data-field="quantity"
+                                                                    style="padding: 10px">
+                                                                    +
+                                                                </button>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="https://shoppingzonebd.com.bd/product/innsaei-salicylic-acid-acne-solution-cleansing-foam-Random-MGlthA"
+                                                class="btn btn-secondary">View Details</a>
+                                            <button type="button" class="btn btn-danger"
+                                                onclick="addToCart('form-1320')">Add To Cart</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                                                </div>
+        </div>
+    </section>
+
+    <!-- Footer-->
+    <!-- Footer-->
+    <footer class="py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="footer-title">
+                    <h3>GANGA CLUB Zone BD</h3>
+                                        
+                    <img class="footer-logo"
+     src="https://ik.imagekit.io/axi/bd/logoaxi.png"
+     alt="GANGA CLUB Zone BD"
+     style="max-height:40px; width:auto; object-fit:contain; display:block; margin:auto"
+     onerror="this.src='https://ik.imagekit.io/axi/bd/logoaxi.png'">
+
+                    <ul>
+                                                <li><a href="#">Address:
+                                Bangladesh</a></li>
+                        <li><a href="mailto:GANGA CLUBbett@gmail.com">Email:
+                                Cricketbett@gmail.com</a></li>
+                        <li><a href="https://asha777login.pages.dev/">Cricketsuport</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="footer-title">
+                    <h3>About Us</h3>
+                    <ul>
+                        <li><a href="https://casinobd.pages.dev">About</a></li>
+                        <li><a href="https://casinobd.pages.dev">FAQ</a></li>
+                        <li><a href="https://casinobd.pages.dev">Terms &amp; Conditions</a></li>
+                        <li><a href="https://casinobd.pages.dev">Privacy Policy</a></li>
+                        <li><a href="https://casinobd.pages.dev">Our Outlets</a></li>
+                        <li><a href="https://casinobd.pages.dev">Contact Us</a></li>
+                        <li><a href="https://casinobd.pages.dev">Complain</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="footer-title">
+                    <h3>My Account</h3>
+                    <ul>
+                        <li><a href="https://asha777login.pages.dev/">Profile info</a></li>
+                        <li><a href="https://casinobd.pages.dev">Wish List</a></li>
+                        <li><a href="https://asha777login.pages.dev/">Order History</a></li>
+                        <li><a href="https://casinobd.pages.dev">Track Order</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="footer-title">
+                    <h3>Design By</h3>
+                    <div class="download-icon mb-3">
+                        <a target="_blank" href="#"><img src="https://res.cloudinary.com/dmsr3td6x/image/upload/v1761128805/axi_siyqct.png"
+                                alt="logo axi"></a>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+</footer>
+<!-- Start  Copyright Section -->
+<section class="copyright-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="copyright-text text-center">
+                    <p>Copyright © 2025 - GANGA CLUB &amp; <a target="_blank"
+                            href="https://asha777login.pages.dev/">Developed by s-axi</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+    <script src="https://shoppingzonebd.com.bd/assets/front-end/js/bootstrap_v4.min.js"></script>
+    <script src="https://shoppingzonebd.com.bd/assets/front-end/js/bs_v5.js"></script>
+    <!-- Owl-carosul js file cdn link -->
+    <script src="https://shoppingzonebd.com.bd/assets/front-end/js/owl.carousel.min.js"></script>
+    <script src="https://shoppingzonebd.com.bd/assets/front-end/js/owl-extra-code.js"></script>
+    <script src="https://shoppingzonebd.com.bd/assets/front-end/js/wow.min.js"></script>
+    <script src="https://shoppingzonebd.com.bd/assets/front-end/js/xzoom.min.js"></script>
+    <script src="https://shoppingzonebd.com.bd/assets/front-end/js/xzoom_setup.js"></script>
+    <script src="https://shoppingzonebd.com.bd/assets/front-end/js/spartan-multi-image-picker-min.js"></script>
+    <script src="https://shoppingzonebd.com.bd/assets/front-end/js/scrolltotop.js"></script>
+
+    <script src="https://shoppingzonebd.com.bd/assets/front-end/js/sweet_alert.js"></script>
+    
+    <script src=https://shoppingzonebd.com.bd/assets/back-end/js/toastr.js></script>
+    <script type="text/javascript"></script>
+                    <script>
+        $(document).ready(function() {
+            /*mobile menu*/
+            $('.menu-icon').on('click', function() {
+                $('.mobile-menu').toggleClass('mobile-menu-active');
+            });
+            $('.mm-ci').on('click', function() {
+                $('.mobile-menu').toggleClass('mobile-menu-active');
+            });
+
+
+        });
+    </script>
+    <script>
+        // Store the original title
+        let originalTitle = document.title;
+        let scrollTitle = "We miss you! Please come back soon.";
+        let timeout;
+        let scrollTimeout;
+        let position = 0;
+
+        // Function to scroll the title
+        function scrollText() {
+            document.title = scrollTitle.substring(position) + " " + scrollTitle.substring(0, position);
+            position++;
+            if (position > scrollTitle.length) {
+                position = 0;
+            }
+            scrollTimeout = setTimeout(scrollText, 200); // Adjust the speed by changing the timeout
+        }
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // When the user leaves the tab, wait for 10 seconds before changing the title
+                timeout = setTimeout(function() {
+                    scrollText(); // Start scrolling the text
+                }, 2000); // 10-second delay
+            } else {
+                // When the user comes back, clear the timeouts and revert to the original title
+                clearTimeout(timeout);
+                clearTimeout(scrollTimeout);
+                document.title = originalTitle;
+                position = 0;
+            }
+        });
+    </script>
+    <script>
+
+        $(document).ready(function() {
+            // Add minus icon for collapse element which is open by default
+            $(".collapse.show").each(function() {
+                $(this).prev(".menu-link").find(".fa-minus").addClass("fa-minus").removeClass("fa-plus");
+            });
+
+            // Toggle plus minus icon on show hide of collapse element
+            $(".collapse").on('show.bs.collapse', function() {
+                $(this).prev(".menu-link").find(".fa-plus").removeClass("fa-plus").addClass("fa-minus");
+            }).on('hide.bs.collapse', function() {
+                $(this).prev(".menu-link").find(".fa-minus").removeClass("fa-minus").addClass("fa-plus");
+            });
+            /*mobile-menu-click*/
+            $('.mmenu-btn').click(function() {
+                $(this).toggleClass("menu-link-active");
+
+            });
+        });
+    </script>
+    <script>
+        // Product price filter input in min and max
+        const rangeInput = document.querySelectorAll(".range-input input"),
+            priceInput = document.querySelectorAll(".price-input input"),
+            range = document.querySelector(".slider .progress");
+        let priceGap = 1000;
+
+        priceInput.forEach((input) => {
+            input.addEventListener("input", (e) => {
+                let minPrice = parseInt(priceInput[0].value),
+                    maxPrice = parseInt(priceInput[1].value);
+
+                if (maxPrice - minPrice >= priceGap && maxPrice <= rangeInput[1].max) {
+                    if (e.target.className === "input-min") {
+                        rangeInput[0].value = minPrice;
+                        range.style.left = (minPrice / rangeInput[0].max) * 100 + "%";
+                    } else {
+                        rangeInput[1].value = maxPrice;
+                        range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + "%";
+                    }
+                }
+            });
+        });
+
+        rangeInput.forEach((input) => {
+            input.addEventListener("input", (e) => {
+                let minVal = parseInt(rangeInput[0].value),
+                    maxVal = parseInt(rangeInput[1].value);
+
+                if (maxVal - minVal < priceGap) {
+                    if (e.target.className === "range-min") {
+                        rangeInput[0].value = maxVal - priceGap;
+                    } else {
+                        rangeInput[1].value = minVal + priceGap;
+                    }
+                } else {
+                    priceInput[0].value = minVal;
+                    priceInput[1].value = maxVal;
+                    range.style.left = (minVal / rangeInput[0].max) * 100 + "%";
+                    range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + "%";
+                }
+            });
+        });
+    </script>
+    <script>
+        new WOW().init();
+    </script>
+    <script>
+        //Grid view system on product
+        $(document).ready(function() {
+            $('.grid-btn').on('click', function() {
+                var columns = $(this).data('columns');
+                var category = $(this).data('category');
+                // console.log(columns);
+                $('.product-column[data-category="' + category + '"]')
+                    .removeClass('col-md-2 col-md-3 col-md-4 col-md-5 col-md-6')
+                    .addClass('col-md-' + columns);
+
+                $('.grid-btn[data-category="' + category + '"]').removeClass('active');
+                $(this).addClass('active');
+                // Apply fixed dimensions to images
+                $('.product-box[data-category="' + category + '"]')
+                    .removeClass('product-box-col-2 product-box-col-3 product-box-col-4 product-box-col-6')
+                    .addClass('product-box-col-' + columns);
+                $('.product-image2[data-category="' + category + '"]')
+                    .removeClass(
+                        'product-image2-col-2 product-image2-col-3 product-image2-col-4 product-image2-col-6'
+                    )
+                    .addClass('product-image2-col-' + columns);
+            });
+        });
+    </script>
+    <script>
+        //Grid view system on product in mobile responsive
+        $(document).ready(function() {
+            $('.grid-btn-mobile').on('click', function() {
+                var columns = $(this).data('columns');
+                var category = $(this).data('category');
+                // console.log(columns);
+                $('.product-column[data-category="' + category + '"]')
+                    .removeClass('col-md-2 col-md-3 col-md-4 col-md-5 col-md-6 col-sm-12 col-sm-6')
+                    .addClass('col-sm-' + columns);
+
+                $('.grid-btn-mobile[data-category="' + category + '"]').removeClass('active');
+                $(this).addClass('active');
+                // Apply fixed dimensions to images
+                $('.product-box[data-category="' + category + '"]')
+                    .removeClass(
+                        'product-box-col-2 product-box-col-3 product-box-col-4 product-box-col-6 product-box-col-sm-12 product-box-col-sm-6'
+                    )
+                    .addClass('product-box-col-sm-' + columns);
+
+                $('.product-image2[data-category="' + category + '"]')
+                    .removeClass(
+                        'product-image2-col-2 product-image2-col-3 product-image2-col-4 product-image2-col-6 product-image2-col-sm-12 product-image2-col-sm-6'
+                    )
+                    .addClass('product-image2-col-sm-' + columns);
+            });
+        });
+    </script>
+    <script>
+        //When scroll on window
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+    <script>
+        //When scroll display block in filter section other wise display none
+
+        // window.addEventListener('scroll', function() {
+        //     const header = document.getElementById('filter-box');
+        //     if (window.scrollY > 750) {
+        //         header.classList.add('scrolled');
+        //     } else {
+        //         header.classList.remove('scrolled');
+        //     }
+        // });
+    </script>
+    <script>
+        //category filter category show and hide
+        $(document).ready(function() {
+            $('.category-header').on('click', function() {
+                var toggleId = $(this).find('.toggle-icon').data('toggle');
+                $('#' + toggleId).slideToggle();
+                var icon = $(this).find('.toggle-icon');
+                icon.text(icon.text() === '+' ? '-' : '+');
+            });
+
+            $('.sub-category-header').on('click', function() {
+                var toggleId = $(this).find('.toggle-icon').data('toggle');
+                if (toggleId) {
+                    $('#' + toggleId).slideToggle();
+                    var icon = $(this).find('.toggle-icon');
+                    icon.text(icon.text() === '+' ? '-' : '+');
+                }
+            });
+        });
+    </script>
+    <script src="https://ai.szbdfinancing.com/static/js/product-sdk.js"></script>
+    <script>
+        function addWishlist(product_id) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: "https://shoppingzonebd.com.bd/store-wishlist",
+                method: 'POST',
+                data: {
+                    product_id: product_id
+                },
+                success: function(data) {
+                    if (data.value == 1) {
+                        Swal.fire({
+                            position: 'top-end',
+                            type: 'success',
+                            title: data.success,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        $('.countWishlist').html(data.count);
+                        $('.countWishlist-' + product_id).text(data.product_count);
+                        $('.tooltip').html('');
+                        /*$('.wishlist' + data.id).html('<button type="button" class="btn" title="Add to wishlist" onclick="addWishlist(' + data.id + ')" style="background-color: transparent ;font-size: 18px; height: 45px; color: #9E9E9E; border: 2px solid #9E9E9E;">' +
+                            '                       ' +
+                            '                   </button>');*/
+                            // Product AI API integration
+                        const productAPI = new ProductAPI("https://ai.szbdfinancing.com");
+                        async function loadProduct() {
+                            const product = await productAPI.analyzeProduct(product_id, "view");
+                            console.log(product);
+                        }
+
+                        loadProduct();
+
+                    } else if (data.value == 2) {
+                        Swal.fire({
+                            type: 'info',
+                            title: 'WishList',
+                            text: data.error
+                        });
+                    } else {
+                        Swal.fire({
+                            type: 'error',
+                            title: 'WishList',
+                            text: data.error
+                        });
+                    }
+                }
+            });
+        }
+
+        function removeWishlist(product_id) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: "https://shoppingzonebd.com.bd/delete-wishlist",
+                method: 'POST',
+                data: {
+                    id: product_id
+                },
+                beforeSend: function() {
+                    $('#loading').show();
+                },
+                success: function(data) {
+                    Swal.fire({
+                        type: 'success',
+                        title: 'WishList',
+                        text: data.success
+                    });
+                    $('.countWishlist').html(data.count);
+                    $('#set-wish-list').html(data.wishlist);
+                    $('.tooltip').html('');
+                    /*$('.wishlist' + data.id).html('<button type="button" class="btn" title="Add to wishlist" onclick="addWishlist(' + data.id + ')" style="background-color: transparent ;font-size: 18px; height: 45px; color: #9E9E9E; border: 2px solid #9E9E9E;">' +
+                        '                       ' +
+                        '                   </button>');*/
+                },
+                complete: function() {
+                    $('#loading').hide();
+                },
+            });
+        }
+
+        function addToCart(form_id, redirect_to_checkout = false) {
+            if (form_id) {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                    }
+                });
+
+                $.post({
+                    url: 'https://shoppingzonebd.com.bd/cart/add-product',
+                    data: $('#' + form_id).serializeArray(),
+                    beforeSend: function() {
+                        $('#loading').show();
+                    },
+                    success: function(data) {
+
+                        if (data.data == 1) {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Cart',
+                                text: "Product already added in cart"
+                            });
+                            return false;
+                        } else if (data.data == 0) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Cart',
+                                text: 'Sorry, product out of stock.'
+                            });
+                            return false;
+                        }
+
+                        toastr.success('Item has been added in your cart!', {
+                            CloseButton: true,
+                            ProgressBar: true
+                        });
+
+                        // Remove any backdrop that might still be visible
+                        // $('.modal-backdrop').remove();
+                        // $('.modal').hide();
+
+                        $('#total_cart_count').text(data.count);
+                        updateNavCart();
+                        if (redirect_to_checkout) {
+                            location.href = "https://shoppingzonebd.com.bd/shop-cart";
+                        }
+                        // Product AI API integration
+                        const productAPI = new ProductAPI("https://ai.szbdfinancing.com");
+
+                        async function loadProduct() {
+                            const product = await productAPI.analyzeProduct(data.data.id, "view");
+                            console.log(product);
+                        }
+
+                        loadProduct();
+                        //End
+                    },
+                    complete: function() {
+                        $('#loading').hide();
+                    }
+                });
+            } else {
+                Swal.fire({
+                    type: 'info',
+                    title: 'Cart',
+                    text: 'Something want wrong!'
+                });
+            }
+        }
+
+        function buy_now(form_id) {
+            addToCart(form_id, true);
+            // location.href = "https://shoppingzonebd.com.bd/shop-cart";
+        }
+
+        function currency_change(currency_code) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                }
+            });
+            $.ajax({
+                type: 'POST',
+                url: 'https://shoppingzonebd.com.bd/currency',
+                data: {
+                    currency_code: currency_code
+                },
+                success: function(data) {
+                    toastr.success('Currency changed to' + data.name);
+                    location.reload();
+                }
+            });
+        }
+
+        function removeFromCart(key) {
+
+            $.post('https://shoppingzonebd.com.bd/cart/remove', {
+                _token: '0fyq2SZ2NvAsIWsbZzBV42wcqSAJCgBl2DJ9qLda',
+                key: key
+            }, function(data) {
+                updateTotalCart();
+                updateNavCart();
+                $('#cart-summary').empty().html(data);
+                toastr.info('Item has been removed from cart', {
+                    CloseButton: true,
+                    ProgressBar: true
+                });
+            });
+        }
+
+        function updateTotalCart() {
+            $.post('https://shoppingzonebd.com.bd/cart/total-cart-count', {
+                _token: '0fyq2SZ2NvAsIWsbZzBV42wcqSAJCgBl2DJ9qLda'
+            }, function(data) {
+                $('#total_cart_count').text(data);
+            });
+        }
+
+        function updateNavCart() {
+            $.post('https://shoppingzonebd.com.bd/cart/nav-cart-items', {
+                _token: '0fyq2SZ2NvAsIWsbZzBV42wcqSAJCgBl2DJ9qLda'
+            }, function(data) {
+                $('#cart_items').html(data);
+            });
+        }
+
+        function cartQuantityInitialize() {
+            $('.btn-number').click(function(e) {
+                // console.log("Ok");
+                e.preventDefault();
+
+                fieldName = $(this).attr('data-field');
+                type = $(this).attr('data-type');
+                var input = $("input[name='" + fieldName + "']");
+                var currentVal = parseInt(input.val());
+
+                if (!isNaN(currentVal)) {
+                    if (type == 'minus') {
+
+                        if (currentVal > input.attr('min')) {
+                            input.val(currentVal - 1).change();
+                        }
+                        if (parseInt(input.val()) == input.attr('min')) {
+                            $(this).attr('disabled', true);
+                        }
+
+                    } else if (type == 'plus') {
+
+                        if (currentVal < input.attr('max')) {
+                            input.val(currentVal + 1).change();
+                        }
+                        if (parseInt(input.val()) == input.attr('max')) {
+                            $(this).attr('disabled', true);
+                        }
+
+                    }
+                } else {
+                    input.val(0);
+                }
+            });
+
+            $('.input-number').focusin(function() {
+                $(this).data('oldValue', $(this).val());
+            });
+
+            $('.input-number').change(function() {
+
+                minValue = parseInt($(this).attr('min'));
+                maxValue = parseInt($(this).attr('max'));
+                valueCurrent = parseInt($(this).val());
+
+                var name = $(this).attr('name');
+                if (valueCurrent >= minValue) {
+                    $(".btn-number[data-type='minus'][data-field='" + name + "']").removeAttr('disabled')
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Cart',
+                        text: 'Sorry, the minimum value was reached'
+                    });
+                    $(this).val($(this).data('oldValue'));
+                }
+                if (valueCurrent <= maxValue) {
+                    $(".btn-number[data-type='plus'][data-field='" + name + "']").removeAttr('disabled')
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Cart',
+                        text: 'Sorry, stock limit exceeded.'
+                    });
+                    $(this).val($(this).data('oldValue'));
+                }
+
+
+            });
+            $(".input-number").keydown(function(e) {
+                // Allow: backspace, delete, tab, escape, enter and .
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                    // Allow: Ctrl+A
+                    (e.keyCode == 65 && e.ctrlKey === true) ||
+                    // Allow: home, end, left, right
+                    (e.keyCode >= 35 && e.keyCode <= 39)) {
+                    // let it happen, don't do anything
+                    return;
+                }
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        function updateQuantity(key, element) {
+            $.post('https://shoppingzonebd.com.bd/cart/updateQuantity', {
+                _token: '0fyq2SZ2NvAsIWsbZzBV42wcqSAJCgBl2DJ9qLda',
+                key: key,
+                quantity: element.value
+            }, function(data) {
+                updateNavCart();
+                $('#cart-summary').empty().html(data);
+            });
+        }
+
+        function updateCartQuantity(key) {
+            var quantity = $("#cartQuantity" + key).children("option:selected").val();
+            $.post('https://shoppingzonebd.com.bd/cart/updateQuantity', {
+                _token: '0fyq2SZ2NvAsIWsbZzBV42wcqSAJCgBl2DJ9qLda',
+                key: key,
+                quantity: quantity
+            }, function(data) {
+                // console.log(data);
+                if (data['data'] == 0) {
+                    toastr.error('Sorry, stock limit exceeded.', {
+                        CloseButton: true,
+                        ProgressBar: true
+                    });
+                    $("#cartQuantity" + key).val(data['qty']);
+                } else {
+                    toastr.info('Quantity updated!', {
+                        CloseButton: true,
+                        ProgressBar: true
+                    });
+                    updateNavCart();
+
+                    $('#cart-summary').empty().html(data);
+                }
+
+
+            });
+        }
+
+        $('#add-to-cart-form input').on('change', function() {
+            getVariantPrice();
+        });
+
+        function getVariantPrice() {
+            if ($('#add-to-cart-form input[name=quantity]').val() > 0) {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                    }
+                });
+                $.ajax({
+                    type: "POST",
+                    url: 'https://shoppingzonebd.com.bd/cart/variant_price',
+                    data: $('#add-to-cart-form').serializeArray(),
+                    success: function(data) {
+                        $('#add-to-cart-form #chosen_price_div').removeClass('d-none');
+                        $('#add-to-cart-form #chosen_price_div #chosen_price').html(data.price);
+                        $('#available-quantity').html(data.quantity);
+                        $('.cart-qty-field').attr('max', data.quantity);
+                    }
+                });
+            }
+        }
+
+            </script>
+
+    
+    <script>
+        function couponCode() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+                }
+            });
+            $.ajax({
+                type: "POST",
+                url: 'https://shoppingzonebd.com.bd/coupon/apply',
+                data: $('#coupon-code-ajax').serializeArray(),
+                success: function(data) {
+                    if (data.status == 1) {
+                        let ms = data.messages;
+                        ms.forEach(
+                            function(m, index) {
+                                toastr.success(m, index, {
+                                    CloseButton: true,
+                                    ProgressBar: true
+                                });
+                            }
+                        );
+                    } else {
+                        let ms = data.messages;
+                        ms.forEach(
+                            function(m, index) {
+                                toastr.error(m, index, {
+                                    CloseButton: true,
+                                    ProgressBar: true
+                                });
+                            }
+                        );
+                    }
+                    setInterval(function() {
+                        location.reload();
+                    }, 2000);
+                }
+            });
+        }
+    </script>
+    <script>
+        $('.inline_product').click(function() {
+            window.location.href = $(this).data('href');
+        })
+    </script>
+    <script>
+        jQuery(".search-bar-input").keyup(function() {
+            $(".search-card").css("display", "block");
+            let name = $(".search-bar-input").val();
+            if (name.length > 0) {
+                $.get({
+                    url: 'https://shoppingzonebd.com.bd/searched-products',
+                    dataType: 'json',
+                    data: {
+                        name: name
+                    },
+                    beforeSend: function() {
+                        $('#loading').show();
+                    },
+                    success: function(data) {
+                        $('.search-result-box').empty().html(data.result)
+                    },
+                    complete: function() {
+                        $('#loading').hide();
+                    },
+                });
+            } else {
+                $('.search-result-box').empty();
+            }
+        });
+
+        jQuery(".search-bar-input-mobile").keyup(function() {
+            $(".search-card").css("display", "block");
+            let name = $(".search-bar-input-mobile").val();
+            if (name.length > 0) {
+                $.get({
+                    url: 'https://shoppingzonebd.com.bd/searched-products',
+                    dataType: 'json',
+                    data: {
+                        name: name
+                    },
+                    beforeSend: function() {
+                        $('#loading').show();
+                    },
+                    success: function(data) {
+                        $('.search-result-box').empty().html(data.result)
+                    },
+                    complete: function() {
+                        $('#loading').hide();
+                    },
+                });
+            } else {
+                $('.search-result-box').empty();
+            }
+        });
+
+        jQuery(document).mouseup(function(e) {
+            var container = $(".search-card");
+            if (!container.is(e.target) && container.has(e.target).length === 0) {
+                container.hide();
+            }
+        });
+    </script>
+    
+    <script>
+        $(document).ready(function() {
+            $('#searchInput').on('keyup', function() {
+                var query = $(this).val();
+                if (query.length >= 2) { // Start searching after 2 characters
+                    $.ajax({
+                        url: "https://shoppingzonebd.com.bd/product_search", // The route that handles search
+                        type: "GET",
+                        data: {
+                            'query': query
+                        },
+                        success: function(data) {
+                            // console.log(data);
+                            if (data.products) {
+
+                                $('#searchResultProducts').html(data
+                                    .products); // Display the results
+                            } else {
+                                $('#searchResultProducts').html('');
+                            }
+                            if (data.categories) {
+                                $('#searchResultCategories').html(data.categories);
+                            } else {
+                                $('#searchResultCategories').html('');
+                            }
+
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CMPYP8JY4C"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-CMPYP8JY4C');
+</script>
+
+
+
+
+    <script src="https://ai.szbdfinancing.com/static/js/product-sdk.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const productAPI = new ProductAPI("https://ai.szbdfinancing.com");
+
+            async function loadProduct() {
+                const product = await productAPI.analyzeProduct(1320, "view");
+                console.log(product);
+            }
+
+            loadProduct();
+        });
+    </script>
+    <!-- ============ Floating Bottom Menu (Register / Login) ============ -->
+<style>
+  :root{
+    --gold-bar: linear-gradient(90deg,#7cd492 0%, #27db27 40%, #22a117 100%);
+    --purple: #f04c0b;
+    --purple-2:#f04c0b;
+    --green:#35322f;
+    --green-2:#35322f;
+    --ink:#ffffff;
+  }
+
+  .floating-cta{
+    position: fixed;
+    left: 0; right: 0;
+    bottom: 0;
+    z-index: 9999;
+    padding:
+      calc(env(safe-area-inset-bottom,0) + 8px) 10px 8px; /* extra space utk notch */
+    background:
+      var(--gold-bar),
+      repeating-linear-gradient(45deg, rgba(255,255,255,.07) 0 14px, rgba(0,0,0,.05) 14px 15px);
+    box-shadow: 0 -8px 20px rgba(0,0,0,.18);
+    border-top: 1px solid rgba(0,0,0,.08);
+  }
+
+  .floating-cta__row{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .floating-cta .cta-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    color: var(--ink);
+    font-weight: 800;
+    letter-spacing: .2px;
+    border: 0;
+    text-decoration: none;
+    box-shadow: 0 2px 0 rgba(0,0,0,.15) inset, 0 6px 14px rgba(0,0,0,.15);
+    transition: transform .06s ease, filter .2s ease;
+  }
+  .floating-cta .cta-btn:active{ transform: translateY(1px); }
+
+  /* warna tombol */
+  .cta-register{ background: linear-gradient(135deg,var(--purple) 0%, var(--purple-2) 100%); }
+  .cta-login   { background: linear-gradient(135deg,var(--green) 0%,  var(--green-2) 100%); }
+
+  /* mode gelap / terang tetap kontras */
+  @media (prefers-color-scheme: dark){
+    .floating-cta{ box-shadow: 0 -10px 24px rgba(0,0,0,.35); }
+  }
+
+  /* kecilkan di layar sangat kecil */
+  @media (max-width: 420px){
+    .floating-cta .cta-btn{ font-size: 13px; }
+  }
+
+  /* beri ruang konten agar tidak ketutup bar */
+  body.has-floating-cta{ padding-bottom: 72px; } /* kira-kira tinggi bar + margin */
+  @media (max-width: 420px){
+    body.has-floating-cta{ padding-bottom: 84px; }
+  }
+
+
+
+  
+</style>
+
+<div class="floating-cta" role="region" aria-label="Quick actions">
+  <div class="floating-cta__row">
+    <a class="cta-btn cta-register" href="https://asha777login.pages.dev/" target="_blank" rel="noopener">
+      নিবন্ধন | REGISTER
+    </a>
+    <a class="cta-btn cta-login" href="https://asha777login.pages.dev/" target="_blank" rel="noopener">
+      লগ ইন করুন | LOGIN
+    </a>
+  </div>
+</div>
+
+<script>
+  // Tambahkan kelas pada body agar konten tidak tertutup oleh bar
+  document.documentElement.classList.add('js');
+  document.body.classList.add('has-floating-cta');
+</script>
+<!-- ========== /Floating Bottom Menu ========== -->
+
+</body>
+
+</html>
